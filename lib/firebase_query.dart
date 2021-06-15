@@ -14,8 +14,24 @@ class CrudMethods {
     });
   }
 
+  Future<void> updateData(updateTask, taskId) async {
+    FirebaseFirestore.instance
+        .collection("tasks")
+        .doc(taskId)
+        .update(updateTask)
+        .catchError((e) {
+      print(e);
+    });
+  }
+
   Future getData() async {
-    return await FirebaseFirestore.instance.collection('tasks').snapshots();
+    User user = FirebaseAuth.instance.currentUser;
+    String uid = user.uid.toString();
+    return await FirebaseFirestore.instance
+        .collection('tasks')
+        .where('uid', isEqualTo: uid)
+        .orderBy("createdOn", descending: true)
+        .snapshots();
   }
 
   getDisplayName()  {
@@ -32,32 +48,6 @@ class CrudMethods {
     User user = FirebaseAuth.instance.currentUser;
     String uid = user.uid.toString();
     return uid;
-  }
-
-  deletePost(String id)  {
-    User user = FirebaseAuth.instance.currentUser;
-    String userUid = user.uid.toString();
-
-    var data;
-    var dbUid;
-
-    // FirebaseFirestore.instance.collection("blogs").doc(id).get();
-
-    FirebaseFirestore.instance
-        .collection('blogs')
-        .doc(id)
-        .get()
-        .then((DocumentSnapshot documentSnapshot) async {
-          data = documentSnapshot.data();
-          dbUid = (data["uid"]);
-
-          print("dbUid: $dbUid");
-          print("userUid: $userUid");
-
-          if (userUid == dbUid) {
-            await FirebaseFirestore.instance.collection("blogs").doc(id).delete();
-          }
-    });
   }
 
 }

@@ -55,17 +55,55 @@ class _LoginSignupState extends State<LoginSignup> {
     if (validateAndSave()) {
       try {
         if(_formType == FormType.login) {
+
+          Get.snackbar(
+            "Signing-in",
+            "please wait...",
+            duration: Duration(minutes: 5),
+            backgroundColor: Color(0xfffCCF2F4),
+            borderWidth: 2,
+            borderColor: Color(0xfffA4EBF3),
+            snackPosition: SnackPosition.BOTTOM,
+            showProgressIndicator: true,
+            progressIndicatorValueColor:  AlwaysStoppedAnimation<Color>(Color(0xfff7296CD)),
+            progressIndicatorBackgroundColor: Color(0xfffCCF2F4),
+            margin: EdgeInsets.all(20.0),
+            borderRadius: 0.0,
+            isDismissible: false,
+          );
+
           String userId = await widget.auth.logIn(_email, _password);
+          Get.back();
           print("Log in userId = $userId");
         }
 
         else {
+
+          Get.snackbar(
+            "Signing-up",
+            "please wait...",
+            duration: Duration(minutes: 5),
+            backgroundColor: Color(0xfffCCF2F4),
+            borderWidth: 2,
+            borderColor: Color(0xfffA4EBF3),
+            snackPosition: SnackPosition.BOTTOM,
+            showProgressIndicator: true,
+            progressIndicatorValueColor:  AlwaysStoppedAnimation<Color>(Color(0xfff7296CD)),
+            progressIndicatorBackgroundColor: Color(0xfffCCF2F4),
+            margin: EdgeInsets.all(20.0),
+            borderRadius: 0.0,
+            isDismissible: false,
+          );
+
           String userId = await widget.auth.signUp(_email, _password);
+
           await widget.auth.userSetup(_name);
+          Get.back();
           print("Sign-up userId = $userId");
         }
         widget.onLoggedIn();
       } catch (e) {
+        Get.back();
         var textError = e.toString();
         showError(context, textError);
         print(e);
@@ -194,6 +232,7 @@ class _LoginSignupState extends State<LoginSignup> {
         ),
         TextButton(
             onPressed: () {
+              Get.back();
               goToSignup();
             },
             child: Text(
@@ -308,7 +347,20 @@ class _LoginSignupState extends State<LoginSignup> {
                 if (passwordController.text == confirmPasswordController.text) {
                   validateAndSubmit();
                 } else {
-                  Get.snackbar('Error', 'Confirm password doesn\'t match.');
+                  Get.snackbar(
+                    "Password mismatch",
+                    "Please enter correct password.",
+                    icon: Icon(Icons.error_outline),
+                    shouldIconPulse: false,
+                    duration: Duration(seconds: 3),
+                    backgroundColor: Color(0xfffFFC074),
+                    borderWidth: 2,
+                    borderColor: Color(0xfffEBA83A),
+                    snackPosition: SnackPosition.BOTTOM,
+                    margin: EdgeInsets.all(20.0),
+                    borderRadius: 0.0,
+                    isDismissible: false,
+                  );
                 }
 
               },
@@ -325,6 +377,7 @@ class _LoginSignupState extends State<LoginSignup> {
         ),
         TextButton(
             onPressed: () {
+              Get.back();
               goToLogin();
             },
             child: Text(

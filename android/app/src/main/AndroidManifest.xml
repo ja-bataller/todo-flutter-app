@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.johnanthonybataller.todo_app">
    <application
-        android:label="Cycling World Blogs"
+        android:label="To-do App"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

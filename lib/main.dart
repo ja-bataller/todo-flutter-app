@@ -10,6 +10,7 @@ void main() async {
   runApp(CyclingWorldBlogs());
 }
 
+
 class CyclingWorldBlogs extends StatelessWidget {
 
   @override
@@ -22,7 +23,7 @@ class CyclingWorldBlogs extends StatelessWidget {
       ),
       theme: ThemeData(
           primarySwatch: Colors.blueGrey,
-          accentColor: Color(0xfff2dac3)
+          accentColor: Color(0xfff7296CD)
       ),
     );
   }

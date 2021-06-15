@@ -9,13 +9,16 @@ import 'package:path/path.dart' as Path;
 
 import 'authentication.dart';
 import 'add_task_page.dart';
+import 'edit_task_page.dart';
 import 'firebase_query.dart';
+
+import 'package:intl/intl.dart';
+
 
 class Home extends StatefulWidget {
   @override
 
   Home({this.auth, this.onLoggedOut});
-
   final AuthImplementation auth;
   final VoidCallback onLoggedOut;
 
@@ -70,8 +73,10 @@ class _HomeState extends State<Home> {
               shrinkWrap: true,
               itemBuilder: (context, index) {
                 return Tasks(
+                  taskId: snapshot.data.docs[index].reference.id,
                   title: snapshot.data.docs[index].data()['title'],
                   description: snapshot.data.docs[index].data()['description'],
+                  dateTime: snapshot.data.docs[index].data()['createdOn'],
                 );
               });
         },
@@ -124,7 +129,7 @@ class _HomeState extends State<Home> {
           tooltip: "Add Task",
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return Upload();
+              return NewTask();
             }));
           },
           child: const Icon(Icons.add, color: Colors.white,),
@@ -185,19 +190,29 @@ class _HomeState extends State<Home> {
 
 class Tasks extends StatelessWidget {
 
-  String title, description;
+  String taskId, title, description;
+  var dateTime;
 
   CrudMethods crudMethods = CrudMethods();
 
   Tasks(
       {
+      @required this.taskId,
       @required this.title,
       @required this.description,
+      @required this.dateTime,
       });
 
 
   @override
   Widget build(BuildContext context) {
+    Timestamp dt = dateTime;
+    DateTime dtd = dt.toDate();
+
+    var strToDateTime = DateTime.parse(dtd.toString());
+    var convertLocal = strToDateTime.toLocal();
+    var newFormat = DateFormat("MM/dd/yyyy hh:mm:ss aaa");
+    String datetimeFinal = newFormat.format(convertLocal);
 
     return Card(
       elevation:  10.0,
@@ -210,36 +225,54 @@ class Tasks extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(fontSize: 25),
-                  textAlign: TextAlign.center,
+                Column(
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(fontSize: 30),
+                    ),
+                  ],
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    deleteDialog(context);
+                    // Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    //   return EditTask(taskId: taskId,);
+                    // }));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditTask(taskId: taskId, title: title, description: description),
+                        ));
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => EditTask(),
+                    //     // Pass the arguments as part of the RouteSettings. The
+                    //     // DetailScreen reads the arguments from these settings.
+                    //     settings: RouteSettings(
+                    //       arguments: taskId,
+                    //     ),
+                    //   ),
+                    // );
                   },
                   child: Icon(
-                    Icons.delete_outline,
-                    color: Colors.red,
+                    Icons.edit,
+                    color: Colors.blue,
                   ),
                   style: ElevatedButton.styleFrom(
                     primary: Colors.transparent,
                     shadowColor: Colors.transparent,
                   ),
-                )
+                ),
               ],
             ),
+
             SizedBox(
-              height: 10.0,
-            ),
-            SizedBox(
-              height: 10.0,
+              height: 5.0,
             ),
             Text(
-              description,
-              style: TextStyle(fontSize: 14),
-              textAlign: TextAlign.center,
+              datetimeFinal,
+              style: TextStyle(fontSize: 12),
             ),
             SizedBox(
               height: 10.0,
@@ -248,92 +281,6 @@ class Tasks extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void deleteDialog(BuildContext context) {
-    var alertDialog = AlertDialog(
-      title: Text("Delete post?"),
-      content: SingleChildScrollView(
-        child: ListBody(
-          children: [Text("Are you sure you want to delete this post?")],
-        ),
-      ),
-      actions: [
-        ElevatedButton(
-          onPressed: ()   {
-            //  DELETE POST
-            // User user = FirebaseAuth.instance.currentUser;
-            // String userUid = user.uid.toString();
-            //
-            // var data;
-            // var dbUid;
-            //
-            // var imgUrl;
-            //
-            // FirebaseFirestore.instance
-            //     .collection('blogs')
-            //     .doc(id)
-            //     .get()
-            //     .then((DocumentSnapshot documentSnapshot) async {
-            //   data = documentSnapshot.data();
-            //   dbUid = (data["uid"]);
-            //   imgUrl = (data["image"]);
-            //
-            //   print("dbUid: $dbUid");
-            //   print("userUid: $userUid");
-            //   print("image: $imgUrl");
-            //
-            //   var url = (data["image"]);
-            //
-            //   var fileUrl = Uri.decodeFull(Path.basename(url)).replaceAll(new RegExp(r'(\?alt).*'), '');
-            //
-            //   if (userUid == dbUid) {
-            //
-            //     Reference storageReference = FirebaseStorage.instance.ref(fileUrl);
-            //     await storageReference.delete();
-            //
-            //     await FirebaseFirestore.instance.collection("blogs").doc(id).delete();
-            //
-            //     Get.back();
-            //     Get.snackbar('Deleted', 'Your post has been deleted.');
-            //   } else {
-            //     deleteErrorDialog(context);
-            //   }
-            // });
-            // crudMethods.deletePost(id);
-
-          },
-          style: ButtonStyle(
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18.0),
-                )),
-            backgroundColor: MaterialStateProperty.all(Colors.redAccent),
-          ),
-          child: Text("Yes"),
-        ),
-        ElevatedButton(
-          style: ButtonStyle(
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18.0),
-                )),
-            backgroundColor: MaterialStateProperty.all(Colors.grey),
-          ),
-          onPressed: () {
-            return Navigator.pop(context);
-          },
-          child: Text("No"),
-        )
-      ],
-    );
-
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
   }
 
   void deleteErrorDialog(BuildContext context) {
