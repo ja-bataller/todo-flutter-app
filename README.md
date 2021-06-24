@@ -1,6 +1,6 @@
 # todo_app
 
-A mobile blog app that let's you share your cycling story.
+A simple to-do mobile application that let you create, update, delete task
 
 ## Getting Started
 
